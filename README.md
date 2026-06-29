@@ -117,6 +117,34 @@ The vision tower is inherited unchanged from the Qwen3.5-9B base (fine-tuning wa
 
 ---
 
+## Picking a quant: RAM & disk
+
+You only need **one** text quant. Pick the largest one that fits comfortably in your RAM (or VRAM, if offloading to GPU). The "RAM to run" figures below include the weights plus headroom for a modest 8k–16k context; very long contexts add KV-cache on top (see [Long context](#long-context-1m-tokens)).
+
+| Quant | Disk size | RAM to run (8k–16k ctx) | When to use |
+|---|---|---|---|
+| Q4_K_M | 5.63 GB | ~8 GB | low-RAM machines; good quality, smallest footprint |
+| Q5_K_M | 6.47 GB | ~9 GB | solid default if you have the room |
+| **Q6_K** | 7.36 GB | ~10 GB | **best quality-for-size for daily use** |
+| Q8_0 | 9.53 GB | ~12 GB | near-lossless; diminishing returns over Q6_K |
+| BF16 | 17.92 GB | ~20 GB+ | **not for running** — keep only if you're making your own quants |
+
+**Rules of thumb:**
+
+- **If RAM ≥ the file size**, the OS caches the model after first load and inference runs full-speed — even from an external drive (only the one-time load is slower).
+- **If RAM < the file size**, llama.cpp pages weights from disk *during* inference. That's slow on an SSD and brutal off a USB stick — drop to a smaller quant instead.
+- **GPU**: the same sizes apply to VRAM for the layers you offload (`-ngl`). Mixed CPU/GPU splits the footprint across both.
+
+**Saving disk space:**
+
+- **Keep one quant** (Q5_K_M or Q6_K for most laptops) and delete the rest. You can always re-download.
+- **Delete BF16** unless you specifically need to re-quantize — it's ~18 GB doing nothing for inference. Switching from BF16 to Q6_K frees ~11 GB and runs *faster*.
+- **MTP variants** are only useful with a llama.cpp build that does draft speculation — skip them otherwise.
+- **mmproj** (~0.9 GB) is only needed for image input — skip it for text-only use.
+- **External drive note:** a GGUF is just a file, so offloading to a flash drive is fine — but format it **exFAT or NTFS**, not FAT32 (FAT32 caps single files at 4 GB, so an 18 GB BF16 won't even copy), use USB 3.0+, and `sha256sum` both copies after moving to catch corruption.
+
+---
+
 ## Quick start
 
 ### llama.cpp (`llama-cli`)
