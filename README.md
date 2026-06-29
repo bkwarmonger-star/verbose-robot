@@ -77,7 +77,7 @@ llama-cli \
 ### Ollama
 
 ```bash
-ollama run hf.co/<your-namespace>/HeavyD-9B-GGUF:Q4_K_M
+ollama run hf.co/bkwarmonger-star/verbose-robot:Q4_K_M
 ```
 
 ### LM Studio / jan / KoboldCpp
