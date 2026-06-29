@@ -25,6 +25,29 @@ HeavyD-9B is a 9B-parameter model built on the Qwen3.5-9B architecture. It suppo
 
 ---
 
+## Try it now
+
+The `.gguf` weights are not in this git repo — they're multi-GB binaries hosted on Hugging Face. Two ways to get running:
+
+**Ollama (easiest — it handles the engine):**
+
+```bash
+ollama run hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M
+```
+
+**Helper script (downloads the quant + runs llama.cpp):**
+
+```bash
+./scripts/try.sh                 # chat, Q4_K_M, GPU if available
+QUANT=Q5_K_M ./scripts/try.sh    # different quant
+MODE=server ./scripts/try.sh     # OpenAI-compatible API on :8080
+NGL=0 ./scripts/try.sh           # CPU-only
+```
+
+> **Naming note:** "HeavyD-9B" is the local name used in this repo's docs. The actual downloadable weights live upstream at [`empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF`](https://huggingface.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF), so the commands above pull from there. The `hf.co/bkwarmonger-star/verbose-robot` path used elsewhere in this card only works once you re-host the GGUFs under your own Hugging Face repo of that name.
+
+---
+
 ## Files
 
 ### Text weights
