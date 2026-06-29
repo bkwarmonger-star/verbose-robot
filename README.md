@@ -44,7 +44,7 @@ MODE=server ./scripts/try.sh     # OpenAI-compatible API on :8080
 NGL=0 ./scripts/try.sh           # CPU-only
 ```
 
-> **Naming note:** "HeavyD-9B" is the local name used in this repo's docs. The actual downloadable weights live upstream at [`empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF`](https://huggingface.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF), so the commands above pull from there. The `hf.co/bkwarmonger-star/verbose-robot` path used elsewhere in this card only works once you re-host the GGUFs under your own Hugging Face repo of that name.
+> **Naming note:** "HeavyD-9B" is the local name used in this repo's docs. The actual downloadable weights live upstream at [`empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF`](https://huggingface.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF), so all commands in this card pull from there — nothing to re-host.
 
 ---
 
@@ -161,7 +161,7 @@ llama-cli \
 ### Ollama
 
 ```bash
-ollama run hf.co/bkwarmonger-star/verbose-robot:Q4_K_M
+ollama run hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M
 ```
 
 ### LM Studio / jan / KoboldCpp
