@@ -48,6 +48,39 @@ NGL=0 ./scripts/try.sh           # CPU-only
 
 ---
 
+## Run it safely (sandboxed)
+
+If you'd rather not run an unfamiliar inference stack directly on your machine, run it in a container. You still get every capability of the model — this only confines the *software*, not the model's features.
+
+**What is and isn't a risk:**
+
+- The `.gguf` weights are **inert data**, not executable code — they can't damage hardware. Heavy inference won't "fry" anything either; thermal throttling protects the GPU/CPU.
+- The thing worth isolating is the **inference engine and any glue scripts**. Use official images/binaries and verify checksums.
+- Keep llama.cpp/Ollama **updated** — the only model-borne risk is a malformed GGUF tripping a parser bug, and a container limits the blast radius if it ever did.
+- Model *output* is a content question, not a hardware one: nothing the model says harms your machine unless you run it unread.
+
+**Containerized run** ([`docker-compose.yml`](./docker-compose.yml) — capped memory/CPU, no extra privileges, API bound to localhost):
+
+```bash
+docker compose up -d
+docker compose exec ollama ollama pull hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M
+docker compose exec ollama ollama run  hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M
+```
+
+**Cut the network for true isolation.** Pull the model first (needs network), then run the container with no network at all — even if anything inside tried to phone home, it can't:
+
+```bash
+docker compose down
+docker run --rm -it --network none \
+  --memory 12g --cpus 6 --cap-drop ALL --security-opt no-new-privileges \
+  -v "$PWD/models/ollama:/root/.ollama" \
+  ollama/ollama bash -c "ollama serve & sleep 2 && ollama run hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M"
+```
+
+No sandbox makes running unknown binaries *zero*-risk, but container + resource caps + `--network none` is the standard strong mitigation and is plenty for evaluating a model like this.
+
+---
+
 ## Files
 
 ### Text weights

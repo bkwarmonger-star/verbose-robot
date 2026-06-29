@@ -1,0 +1,49 @@
+# Run HeavyD-9B in an isolated container.
+#
+# Why: the weights themselves are inert data, but you don't want to run an
+# unfamiliar inference stack straight on your host. This confines it — capped
+# memory/CPU, no extra privileges, models in a mounted folder, API bound to
+# localhost only. You can also cut its network entirely (see README).
+#
+#   docker compose up -d
+#   docker compose exec ollama ollama pull hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M
+#   docker compose exec ollama ollama run  hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M
+#
+services:
+  ollama:
+    image: ollama/ollama:latest        # official image — pin a @sha256 digest for repeatability
+    container_name: heavyd
+
+    # --- hardening: limit blast radius if anything in here misbehaves ---
+    security_opt:
+      - no-new-privileges:true          # process can't gain privileges via setuid
+    cap_drop:
+      - ALL                             # drop all Linux capabilities
+
+    # --- resource caps so it can't OOM or peg the whole host ---
+    deploy:
+      resources:
+        limits:
+          memory: 12g                   # Q4_K_M needs ~6-8g; raise for bigger quants/context
+          cpus: "6"
+
+    # models persist here on the host; this is the only path the container can write
+    volumes:
+      - ./models/ollama:/root/.ollama
+
+    # API reachable only from THIS machine, never the LAN/internet
+    ports:
+      - "127.0.0.1:11434:11434"
+
+    restart: "no"
+
+    # --- GPU (optional): uncomment to offload layers. Needs nvidia-container-toolkit.
+    #     Note: passing a device through slightly reduces isolation — CPU-only is the
+    #     most locked-down option.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
