@@ -1,0 +1,20 @@
+# Ollama Modelfile for HeavyD-9B from a local GGUF.
+#
+#   1. download a quant into ./models (or let scripts/try.sh do it), e.g.:
+#        hf download empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF \
+#          Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M.gguf --local-dir ./models
+#   2. point FROM at it (edit the path/quant below if needed)
+#   3. ollama create heavyd -f scripts/Modelfile
+#   4. ollama run heavyd
+#
+# The Qwen3.5 chat template is embedded in the GGUF, so Ollama loads it
+# automatically — no TEMPLATE block needed here.
+
+FROM ./models/Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M.gguf
+
+# recommended sampling (Qwen3.5 thinking mode)
+PARAMETER temperature 0.6
+PARAMETER top_p 0.95
+PARAMETER top_k 20
+PARAMETER repeat_penalty 1.05
+PARAMETER num_ctx 16384
